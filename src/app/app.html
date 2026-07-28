@@ -36,7 +36,7 @@
       </div>
       <div *ngIf="!(searchState.isLoading$ | async) && (searchState.results$ | async) as results">
         <ul *ngIf="results.length > 0" 
-            [ngClass]="{'results-list': viewMode === 'list', 'results-grid': viewMode === 'tile'}"
+            [ngClass]="{'results-list': viewMode === ViewMode.List, 'results-grid': viewMode === ViewMode.Tile}"
             role="list" 
             aria-label="Search results">
           <li *ngFor="let track of results" 
@@ -46,7 +46,7 @@
               role="listitem"
               class="result-item"
               [class.flying]="isFlying && selectedTrack?.id === track.id">
-            <img *ngIf="viewMode === 'tile'" [src]="track.imageUrl" [alt]="track.trackName" class="tile-img" />
+            <img *ngIf="viewMode === ViewMode.Tile" [src]="track.imageUrl" [alt]="track.trackName" class="tile-img" />
             <div class="track-info">
               <span class="track-title">{{ track.trackName }}</span>
               <span class="track-artist">{{ track.artistName }}</span>
@@ -70,17 +70,17 @@
               Next
             </button>
           </div>
-          <div class="view-toggle" role="group" aria-label="שינוי תצוגה">
+          <div class="view-toggle" role="group" aria-label="change visibility">
             <button 
-              (click)="toggleViewMode('list')" 
-              [class.active]="viewMode === 'list'" 
+              (click)="toggleViewMode(ViewMode.List)" 
+              [class.active]="viewMode === ViewMode.List" 
               class="btn btn-icon"
               aria-label="List view">
               List
             </button>
             <button 
-              (click)="toggleViewMode('tile')" 
-              [class.active]="viewMode === 'tile'" 
+              (click)="toggleViewMode(ViewMode.Tile)" 
+              [class.active]="viewMode === ViewMode.Tile" 
               class="btn btn-icon"
               aria-label="Grid view">
               Grid

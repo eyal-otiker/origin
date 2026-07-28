@@ -6,6 +6,11 @@ import { SearchStateService } from './services/search-state.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+export enum ViewMode {
+  List = 'list',
+  Tile = 'tile'
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -16,7 +21,8 @@ import { FormsModule } from '@angular/forms';
 
 export class App implements OnInit {
   public searchQuery: string = '';
-  public viewMode: 'list' | 'tile' = 'list'; 
+  public ViewMode: typeof ViewMode = ViewMode; 
+  public viewMode = ViewMode.List;
   public selectedTrack: TrackResult | null = null;
   public isFlying: boolean = false; 
   public isPlaying: boolean = false;
@@ -28,7 +34,7 @@ export class App implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const savedView = localStorage.getItem('preferred_view_mode') as 'list' | 'tile';
+    const savedView = localStorage.getItem('preferred_view_mode') as ViewMode;
     if (savedView) {
       this.viewMode = savedView;
     }
@@ -57,7 +63,7 @@ export class App implements OnInit {
     }
   }
 
-  public toggleViewMode(mode: 'list' | 'tile'): void {
+  public toggleViewMode(mode: ViewMode): void {
     this.viewMode = mode;
     localStorage.setItem('preferred_view_mode', mode);
   }
