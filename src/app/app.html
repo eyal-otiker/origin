@@ -1,1 +1,136 @@
+<div class="app-container" dir="rtl">
+  
+  <header class="main-header">
+    <h1>Music Search & Player</h1>
+  </header>
+
+  <main class="main-layout">
+    <section class="search-container" aria-label="Search and results section">
+      <div class="search-bar">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (keyup.enter)="onSearch()"
+          placeholder="Search for a song or artist..." 
+          aria-label="Enter search term"
+          class="search-input"
+        />
+        <button 
+          (click)="onSearch()" 
+          [disabled]="!searchQuery.trim()" 
+          aria-label="Perform search"
+          class="btn btn-primary">
+          Search
+        </button>
+      </div>
+      <div *ngIf="searchState.isLoading$ | async" class="state-box loading-box" role="status">
+        <div class="spinner"></div>
+        <p>Loading results...</p>
+      </div>
+      <div *ngIf="searchState.error$ | async as error" class="state-box error-box" role="alert">
+        <p>{{ error }}</p>
+        <button (click)="onRetry()" class="btn btn-retry">Try Again</button>
+      </div>
+      <div *ngIf="!(searchState.isLoading$ | async) && !(searchState.error$ | async) && (searchState.results$ | async)?.length === 0 && searchState.currentQuery" class="state-box empty-box">
+        <p>No results found for "{{ searchState.currentQuery }}".</p>
+      </div>
+      <div *ngIf="!(searchState.isLoading$ | async) && (searchState.results$ | async) as results">
+        <ul *ngIf="results.length > 0" 
+            [ngClass]="{'results-list': viewMode === 'list', 'results-grid': viewMode === 'tile'}"
+            role="list" 
+            aria-label="Search results">
+          <li *ngFor="let track of results" 
+              (click)="onSelectTrack(track)"
+              (keyup.enter)="onSelectTrack(track)"
+              tabindex="0" 
+              role="listitem"
+              class="result-item"
+              [class.flying]="isFlying && selectedTrack?.id === track.id">
+            <img *ngIf="viewMode === 'tile'" [src]="track.imageUrl" [alt]="track.trackName" class="tile-img" />
+            <div class="track-info">
+              <span class="track-title">{{ track.trackName }}</span>
+              <span class="track-artist">{{ track.artistName }}</span>
+            </div>
+          </li>
+        </ul>
+        <div *ngIf="results.length > 0" class="pagination-controls">
+          <div class="paging-buttons">
+            <button 
+              (click)="onPrevPage()" 
+              [disabled]="!searchState.prevCursor || (searchState.isLoading$ | async)" 
+              class="btn btn-secondary"
+              aria-label="Previous page">
+              Previous
+            </button>
+            <button 
+              (click)="onNextPage()" 
+              [disabled]="!searchState.nextCursor || (searchState.isLoading$ | async)" 
+              class="btn btn-secondary"
+              aria-label="Next page">
+              Next
+            </button>
+          </div>
+          <div class="view-toggle" role="group" aria-label="שינוי תצוגה">
+            <button 
+              (click)="toggleViewMode('list')" 
+              [class.active]="viewMode === 'list'" 
+              class="btn btn-icon"
+              aria-label="List view">
+              List
+            </button>
+            <button 
+              (click)="toggleViewMode('tile')" 
+              [class.active]="viewMode === 'tile'" 
+              class="btn btn-icon"
+              aria-label="Grid view">
+              Grid
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="image-container" aria-label="Main image and player">
+      <div *ngIf="!selectedTrack" class="placeholder-box">
+        <p>Select a song from the results to display its image here</p>
+      </div>
+      <div *ngIf="selectedTrack" class="active-track-card">
+        <div class="central-image-wrapper" (click)="onPlayCentralImage()" tabindex="0" (keyup.enter)="onPlayCentralImage()" role="button" aria-label="Play song">
+          <img [src]="selectedTrack.imageUrl" [alt]="selectedTrack.trackName" class="central-image" />
+          <div *ngIf="!isPlaying" class="play-overlay">
+            <span class="play-icon">▶</span>
+            <span>Click to play</span>
+          </div>
+        </div>
+        <h3 class="selected-title">{{ selectedTrack.trackName }}</h3>
+        <div *ngIf="isPlaying && safeEmbedUrl" class="player-embed-wrapper">
+          <iframe 
+            [src]="safeEmbedUrl" 
+            width="100%" 
+            height="120" 
+            frameborder="0" 
+            allow="autoplay"
+            title="Embedded music player">
+          </iframe>
+        </div>
+      </div>
+    </section>
+    <aside class="recent-searches-container" aria-label="Recent Searches">
+      <h2>Recent Searches</h2>    
+      <ng-container *ngIf="searchState.history$ | async as history">
+        <p *ngIf="history.length === 0" class="no-history">No recent searches</p>  
+        <ul class="history-list" role="list">
+          <li *ngFor="let term of history" 
+              (click)="onHistorySelect(term)"
+              (keyup.enter)="onHistorySelect(term)"
+              tabindex="0" 
+              role="button"
+              class="history-item">
+            🔍 {{ term }}
+          </li>
+        </ul>
+      </ng-container>
+    </aside>
+  </main>
+</div>
+
 <router-outlet />
