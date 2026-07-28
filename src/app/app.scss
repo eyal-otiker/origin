@@ -1,0 +1,12 @@
+.app-container {
+  direction: ltr;
+  text-align: left;
+}
+
+.search-bar, 
+.paging-buttons, 
+.view-toggle {
+  display: flex;
+  flex-direction: row; 
+  justify-content: flex-start;
+}
