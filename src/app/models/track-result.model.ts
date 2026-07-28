@@ -1,6 +1,6 @@
 export interface TrackResult {
   id: string;
-  title: string;
+  trackName: string;
   artistName: string;
   imageUrl: string;
   audioEmbedUrl: string;
